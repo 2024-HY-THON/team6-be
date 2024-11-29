@@ -36,3 +36,4 @@ class HabitCreateSerializer(serializers.Serializer):
             )
 
         return category
+    
