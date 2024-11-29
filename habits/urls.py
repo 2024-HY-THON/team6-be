@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserCategoryList, CategoryDelete, HabitCreate, CategoryContent, UpdateContent, ActionCreate, MainPage
+from .views import UserCategoryList, CategoryDelete, HabitCreate, CategoryContent, UpdateContent, ActionCreate, MainPage, CategoryAlarmTimeUpdate
 
 urlpatterns = [
     path('<str:user_id>/', UserCategoryList.as_view(), name='user-category-list'),
@@ -9,4 +9,6 @@ urlpatterns = [
     path('update/<str:user_id>/<int:category_id>/', UpdateContent.as_view(), name='update_category_or_content'),
     path('action/create/', ActionCreate.as_view(), name='action_create'),
     path('main/<str:user_id>/', MainPage.as_view(), name='user_selected_categories'),
+
+    path('alarm/update/<str:user_id>/<int:category_id>/', CategoryAlarmTimeUpdate.as_view(), name='category-alarm-time-update'),
 ]

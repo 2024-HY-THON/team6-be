@@ -3,6 +3,9 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
+from django.views.decorators.csrf import csrf_exempt
+from config.fcm import send_alarm_message
+from django.http import JsonResponse
 
 User = get_user_model()
 
@@ -142,3 +145,26 @@ class DeleteSpecificUserView(APIView):
             return Response({"message": "사용자가 성공적으로 삭제되었습니다."}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"error": "사용자를 찾을 수 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+
+# fcm token
+CustomUser = get_user_model()
+
+@csrf_exempt  # CSRF 인증을 비활성화하려면 사용
+def update_fcm_token_view(request):
+    if request.method == 'POST':
+        token = request.POST.get('fcm_token')
+        user_id = request.POST.get('user_id')  # 사용자 식별 필드
+        
+        if not token:
+            return JsonResponse({'error': 'No token provided'}, status=400)
+        
+        try:
+            # 사용자 검색 및 토큰 업데이트
+            user = CustomUser.objects.get(id=user_id)
+            user.fcm_token = token
+            user.save()
+            return JsonResponse({'message': 'Token updated successfully'}, status=200)
+        except CustomUser.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)

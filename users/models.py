@@ -35,6 +35,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     password = models.CharField(max_length=128)  
     is_active = models.BooleanField(default=True)  
     is_staff = models.BooleanField(default=False)  
+    fcm_token = models.CharField(max_length=255, blank=True, null=True)  # FCM 토큰 필드 추가
 
     objects = CustomUserManager()
 

@@ -178,3 +178,17 @@ class MainPage(APIView):
 
         # 결과 반환
         return Response(result, status=200)
+    
+# 알림 시간 설정
+class CategoryAlarmTimeUpdate(APIView):
+    def put(self, request, user_id, category_id):
+        user = get_object_or_404(CustomUser, id=user_id)
+        category = get_object_or_404(Category, category_id=category_id, user=user)
+        
+        alarm_time = request.data.get("alarm_time")
+        if alarm_time:
+            category.alarm_time = alarm_time
+            category.save()
+            return Response({"message": "알람 시간이 업데이트 되었습니다."}, status=status.HTTP_200_OK)
+        
+        return Response({"error": "유효하지 않은 알람시간입니다."}, status=status.HTTP_400_BAD_REQUEST)

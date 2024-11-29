@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import CustomUser  # users 앱의 CustomUser 모델 import
+from django.utils.timezone import now
 
 # Category 모델 정의
 class Category(models.Model):
@@ -7,6 +8,7 @@ class Category(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # 유저 ID (Foreign Key)
     category = models.CharField(max_length=100)  # 카테고리 이름
     choose = models.BooleanField(default=False) # 카테고리 선택 여부
+    alarm_time = models.TimeField(null=True, blank=True) # 알림 시간 설정
     #created = models.DateTimeField(auto_now_add=True)  # 작성 날짜
     #updated = models.DateTimeField(auto_now=True)  # 수정 날짜
     #button = models.BooleanField(default=False)  # 알람 선택 여부

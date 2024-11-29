@@ -16,14 +16,17 @@ import os
 import firebase_admin
 from firebase_admin import credentials
 
-# Firebase 서비스 계정 JSON 경로
-cred = credentials.Certificate('serviceAccountKey.json')
-
-# Firebase 앱 초기화
-firebase_admin.initialize_app(cred)
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Firebase 서비스 계정 JSON 경로
+cred = credentials.Certificate(os.path.join(BASE_DIR, 'serviceAccountKey.json'))
+
+# Firebase 앱이 이미 초기화되었는지 확인
+if not firebase_admin._apps:
+    firebase_admin.initialize_app(cred)
+
+FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, 'serviceAccountKey.json')
 
 
 # Quick-start development settings - unsuitable for production
@@ -33,7 +36,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-yq@3=m&7l=zubpx+io%x+69b%)-_pjoltg09wjcr7#-n#0=pw0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '3.223.239.126']
 
@@ -51,6 +54,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'users.apps.UsersConfig',
     'habits.apps.HabitsConfig',
+    'django_celery_beat',
 ]
 
 REST_FRAMEWORK = {
