@@ -26,3 +26,13 @@ class Habit(models.Model):
 
     def __str__(self):
         return self.content
+
+# Action 모델 정의
+class Action(models.Model):
+    habit = models.ForeignKey(Habit, on_delete=models.CASCADE)  # Habit ID (Foreign Key)
+    do_or_not = models.BooleanField(default=False)  # 실천 여부
+    created = models.DateField(auto_now_add=True)  # 생성 날짜
+
+    def __str__(self):
+        return f"Action for Habit ID: {self.habit.habit_id} - {'Done' if self.do_or_not else 'Not Done'}"
+    
