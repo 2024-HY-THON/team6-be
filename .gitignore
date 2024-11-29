@@ -1,0 +1,42 @@
+# Python-specific ignores
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+*.log
+
+# Environment variables
+.env
+.env.*
+
+# Django-specific ignores
+db.sqlite3
+media/
+
+# Firebase service account file
+serviceAccountKey.json
+
+# Byte-compiled files and caches
+*.swp
+*.swo
+*.bak
+
+# System files
+.DS_Store
+Thumbs.db
+*.~lock.*
+*.tmp
+
+# Editor-specific ignores
+.idea/
+.vscode/
+*.iml
+
+# Node.js (if applicable for frontend)
+node_modules/
+npm-debug.log
+yarn-error.log
