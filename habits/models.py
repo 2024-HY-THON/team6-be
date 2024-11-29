@@ -1,6 +1,6 @@
 from django.db import models
 from users.models import CustomUser  # users 앱의 CustomUser 모델 import
-from django.utils.timezone import now
+from django.utils import timezone
 
 # Category 모델 정의
 class Category(models.Model):
@@ -25,6 +25,7 @@ class Habit(models.Model):
     content = models.JSONField()  # 습관 내용
     created = models.DateTimeField(auto_now_add=True)  # 작성 날짜
     updated = models.DateTimeField(auto_now=True)  # 수정 날짜
+    randomly_selected = models.BooleanField(default=False)
 
     def __str__(self):
         return self.content

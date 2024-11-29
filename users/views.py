@@ -36,6 +36,7 @@ class UserDetailView(APIView):
         user = request.user
         return Response({
             "id": user.id,
+            "password" : user.password,
             "email": user.email,
             "nickname": user.nickname,
         }, status=status.HTTP_200_OK)
@@ -168,3 +169,22 @@ def update_fcm_token_view(request):
             return JsonResponse({'error': 'User not found'}, status=404)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+class TestFCMNotification(APIView):
+    def post(self, request):
+        # 요청에서 디바이스 토큰, 제목, 본문 가져오기
+        token = request.data.get('token')
+        title = request.data.get('title', 'Test Notification')
+        body = request.data.get('body', 'This is a test message from the Django server.')
+
+        if not token:
+            return Response({"error": "Token is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # FCM 메시지 전송
+        response = send_alarm_message(token, title, body)
+
+        if response:
+            return Response({"message": "Notification sent successfully", "response": response}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Failed to send notification"}, status=status.HTTP_400_BAD_REQUEST)

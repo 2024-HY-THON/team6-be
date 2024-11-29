@@ -36,3 +36,16 @@ class HabitCreateSerializer(serializers.Serializer):
             )
 
         return category
+    
+
+class RandomHabitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Habit
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        # randomly_selected 필드가 True인 경우에만 출력
+        if instance.randomly_selected:
+            return representation
+        return None  # 랜덤으로 선택되지 않은 습관은 제외

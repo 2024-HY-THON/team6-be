@@ -36,7 +36,7 @@ FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, 'serviceAccountKey.json')
 SECRET_KEY = 'django-insecure-yq@3=m&7l=zubpx+io%x+69b%)-_pjoltg09wjcr7#-n#0=pw0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '3.223.239.126']
 

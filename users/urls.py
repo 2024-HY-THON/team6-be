@@ -4,7 +4,7 @@ from .views import (
     UserRegistrationView, PasswordUpdateView, EmailUpdateView,
     NicknameUpdateView, UserDeleteView, UserDetailView,
     CheckDuplicateIDView, CheckDuplicateEmailView, CheckDuplicateNicknameView,
-    AllUsersView, DeleteSpecificUserView
+    AllUsersView, DeleteSpecificUserView, TestFCMNotification
 )
 
 urlpatterns = [
@@ -25,4 +25,5 @@ urlpatterns = [
     path('user/admin/delete/<str:pk>/', DeleteSpecificUserView.as_view(), name='delete_specific_user'),  
 
     path('fcm/token/', views.update_fcm_token_view, name='update_fcm_token'),
+    path('api/test-fcm-notification/', TestFCMNotification.as_view(), name='test_fcm_notification'),
 ]

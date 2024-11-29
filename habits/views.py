@@ -2,10 +2,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Category, Habit, Action
-from .serializers import CategorySerializer, HabitCreateSerializer
+from .serializers import CategorySerializer, HabitCreateSerializer, RandomHabitSerializer
 from django.shortcuts import get_object_or_404
 from users.models import CustomUser  # CustomUser 모델 import
 from django.utils.timezone import now
+from rest_framework.permissions import IsAuthenticated
+import random
+
 
 class UserCategoryList(APIView):
     def get(self, request, user_id):
@@ -192,3 +195,27 @@ class CategoryAlarmTimeUpdate(APIView):
             return Response({"message": "알람 시간이 업데이트 되었습니다."}, status=status.HTTP_200_OK)
         
         return Response({"error": "유효하지 않은 알람시간입니다."}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class RandomHabitView(APIView):
+    permission_classes = [IsAuthenticated]  # 로그인된 사용자만 접근 가능
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        # user가 선택한 카테고리 중 alarm_time이 설정되어 있고, choose가 True인 카테고리 필터링
+        categories = Category.objects.filter(user=user, choose=True, alarm_time__isnull=False)
+
+        if not categories:
+            return Response({"detail": "No category with alarm_time found."}, status=404)
+
+        # 카테고리 내에서 랜덤으로 Habit 선택
+        random_category = random.choice(categories)
+        habits = Habit.objects.filter(category=random_category, randomly_selected=True)
+
+        if not habits:
+            return Response({"detail": "No randomly selected habit found."}, status=404)
+
+        # 랜덤한 습관 반환
+        random_habit = random.choice(habits)
+        serializer = RandomHabitSerializer(random_habit)
+        return Response(serializer.data)
