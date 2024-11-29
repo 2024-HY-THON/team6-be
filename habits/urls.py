@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import UserCategoryList, CategoryDelete, HabitCreate, CategoryContent, UpdateContent, ActionCreate, MainPage, CategoryAlarmTimeUpdate, RandomHabitView
+from .views import UserCategoryList, CategoryDelete, HabitCreate, CategoryContent, UpdateContent, ActionCreate, MainPage, CategoryAlarmTimeUpdate, CategoryRandomHabitView, TriggerAlarmTask
+
 
 urlpatterns = [
     path('<str:user_id>/', UserCategoryList.as_view(), name='user-category-list'),
@@ -11,5 +12,8 @@ urlpatterns = [
     path('main/<str:user_id>/', MainPage.as_view(), name='user_selected_categories'),
 
     path('alarm/update/<str:user_id>/<int:category_id>/', CategoryAlarmTimeUpdate.as_view(), name='category-alarm-time-update'),
-    path('random/habit/', RandomHabitView.as_view(), name='random_habit'),
+
+    path('random/habit/<str:user_id>/<int:category_id>/', CategoryRandomHabitView.as_view(), name='category-random-habit'),
+
+    path('trigger-alarm/<int:category_id>/', TriggerAlarmTask.as_view(), name='trigger_alarm_task'),
 ]

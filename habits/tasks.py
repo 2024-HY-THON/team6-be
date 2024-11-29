@@ -13,16 +13,19 @@ def send_category_alarm(self):
         choose=True,
         alarm_time__hour=now.hour,
         alarm_time__minute=now.minute
-    ).select_related('user')  # 유저 정보 최적화
+    ).select_related('user')
 
     for category in categories:
-        user = category.user  # 연관된 유저
+        user = category.user
         habits = list(Habit.objects.filter(category=category))
 
         if habits:
-            habit = choice(habits)  # 랜덤으로 습관 선택
+            # 랜덤하게 Habit 선택 및 Category의 random_habit 업데이트
+            habit = choice(habits)
+            category.random_habit = habit
+            category.save(update_fields=['random_habit'])
+
             token = user.fcm_token  # 유저의 FCM 토큰 가져오기
-            
             if token:
                 try:
                     send_alarm_message(
@@ -33,3 +36,4 @@ def send_category_alarm(self):
                 except Exception as e:
                     # 예외 발생 시 로깅
                     print(f"FCM 메시지 전송 실패: {e}")
+

@@ -13,6 +13,15 @@ class Category(models.Model):
     #updated = models.DateTimeField(auto_now=True)  # 수정 날짜
     #button = models.BooleanField(default=False)  # 알람 선택 여부
 
+    # 랜덤하게 선택된 Habit을 저장할 필드
+    random_habit = models.ForeignKey(
+        'Habit',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='randomly_selected_category'
+    )
+
     def __str__(self):
         return self.category
 

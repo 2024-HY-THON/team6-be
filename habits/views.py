@@ -7,7 +7,8 @@ from django.shortcuts import get_object_or_404
 from users.models import CustomUser  # CustomUser 모델 import
 from django.utils.timezone import now
 from rest_framework.permissions import IsAuthenticated
-import random
+
+from .tasks import send_category_alarm
 
 
 class UserCategoryList(APIView):
@@ -195,27 +196,27 @@ class CategoryAlarmTimeUpdate(APIView):
             return Response({"message": "알람 시간이 업데이트 되었습니다."}, status=status.HTTP_200_OK)
         
         return Response({"error": "유효하지 않은 알람시간입니다."}, status=status.HTTP_400_BAD_REQUEST)
-    
 
-class RandomHabitView(APIView):
-    permission_classes = [IsAuthenticated]  # 로그인된 사용자만 접근 가능
 
-    def get(self, request, *args, **kwargs):
-        user = request.user
-        # user가 선택한 카테고리 중 alarm_time이 설정되어 있고, choose가 True인 카테고리 필터링
-        categories = Category.objects.filter(user=user, choose=True, alarm_time__isnull=False)
+class CategoryRandomHabitView(APIView):
+    permission_classes = [IsAuthenticated]
 
-        if not categories:
-            return Response({"detail": "No category with alarm_time found."}, status=404)
+    def get(self, request, user_id, category_id):
+        try:
+            category = Category.objects.get(category_id=category_id, user__id=user_id)
+            random_habit = category.random_habit
+            if random_habit:
+                return Response({
+                    'category': category.category,
+                    'random_habit': random_habit.content
+                })
+            return Response({'error': 'No habit selected yet.'}, status=404)
+        except Category.DoesNotExist:
+            return Response({'error': 'Category not found.'}, status=404)
 
-        # 카테고리 내에서 랜덤으로 Habit 선택
-        random_category = random.choice(categories)
-        habits = Habit.objects.filter(category=random_category, randomly_selected=True)
 
-        if not habits:
-            return Response({"detail": "No randomly selected habit found."}, status=404)
-
-        # 랜덤한 습관 반환
-        random_habit = random.choice(habits)
-        serializer = RandomHabitSerializer(random_habit)
-        return Response(serializer.data)
+class TriggerAlarmTask(APIView):
+    def post(self, request, category_id):
+        # Celery 작업을 트리거하는 코드
+        send_category_alarm.apply_async(args=[category_id])  # category_id를 인자로 보내기
+        return Response({"message": "알림 작업이 큐에 추가되었습니다."}, status=status.HTTP_200_OK)
