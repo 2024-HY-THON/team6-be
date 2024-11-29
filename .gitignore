@@ -17,9 +17,6 @@ build/
 db.sqlite3
 media/
 
-# Firebase service account file
-serviceAccountKey.json
-
 # Byte-compiled files and caches
 *.swp
 *.swo
