@@ -233,7 +233,10 @@ class CategoryRandomHabitView(APIView):
             # 결과 반환
             return Response({
                 'category': category.category,
-                'random_habit': random_habit.content
+                'random_habit': {
+                    'habit_id': random_habit.habit_id,
+                    'content': random_habit.content
+                }
             }, status=200)
 
         except CustomUser.DoesNotExist:
