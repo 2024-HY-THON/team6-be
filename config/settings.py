@@ -129,6 +129,14 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+
+CELERY_BROKER_URL = 'pyamqp://guest:guest@3.223.239.126:5672//'
+CELERY_RESULT_BACKEND = 'rpc://'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Seoul'  # 서울 시간대로 설정
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 

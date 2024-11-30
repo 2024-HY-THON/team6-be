@@ -197,6 +197,29 @@ class CategoryAlarmTimeUpdate(APIView):
         
         return Response({"error": "유효하지 않은 알람시간입니다."}, status=status.HTTP_400_BAD_REQUEST)
 
+# 선택 여부
+class UpdateCategoryChooseView(APIView):
+    permission_classes = [IsAuthenticated]  # 인증된 사용자만 접근 가능
+
+    def patch(self, request, category_id):
+        try:
+            # 해당 카테고리를 가져옵니다.
+            category = Category.objects.get(category_id=category_id, user=request.user)
+        except Category.DoesNotExist:
+            return Response({"error": "Category not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # 요청 데이터에서 'choose' 값을 가져옵니다.
+        choose_value = request.data.get('choose')
+        if choose_value is None:
+            return Response({"error": "'choose' field is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 'choose' 값을 업데이트합니다.
+        category.choose = choose_value
+        category.save()
+
+        # 직렬화 후 반환합니다.
+        serializer = CategorySerializer(category)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class CategoryRandomHabitView(APIView):
     permission_classes = [IsAuthenticated]
@@ -218,5 +241,5 @@ class CategoryRandomHabitView(APIView):
 class TriggerAlarmTask(APIView):
     def post(self, request, category_id):
         # Celery 작업을 트리거하는 코드
-        send_category_alarm.apply_async(args=[category_id])  # category_id를 인자로 보내기
+        send_category_alarm.apply_async(kwargs={'category_id': category_id})
         return Response({"message": "알림 작업이 큐에 추가되었습니다."}, status=status.HTTP_200_OK)

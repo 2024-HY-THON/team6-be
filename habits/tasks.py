@@ -3,13 +3,17 @@ from datetime import datetime
 from .models import Category, Habit
 from config.fcm import send_alarm_message
 from random import choice
+import logging
+
+logger = logging.getLogger(__name__)
 
 @shared_task(bind=True, acks_late=True)
-def send_category_alarm(self):
+def send_category_alarm(self, category_id=None):
     now = datetime.now()
 
-    # 알람 시간이 현재 시간과 일치하는 카테고리 조회
+    # 카테고리 필터링
     categories = Category.objects.filter(
+        category_id=category_id,
         choose=True,
         alarm_time__hour=now.hour,
         alarm_time__minute=now.minute
@@ -26,6 +30,15 @@ def send_category_alarm(self):
             category.save(update_fields=['random_habit'])
 
             token = user.fcm_token  # 유저의 FCM 토큰 가져오기
+            # token = 
+
+            message_title = f"알림: {category.category}"
+            message_body = f"오늘의 습관: {habit.content}"
+
+            # 메시지 로그 출력
+            logger.info(f"메시지 제목: {message_title}")
+            logger.info(f"메시지 내용: {message_body}")
+
             if token:
                 try:
                     send_alarm_message(
@@ -34,6 +47,6 @@ def send_category_alarm(self):
                         f"오늘의 습관: {habit.content}"
                     )
                 except Exception as e:
-                    # 예외 발생 시 로깅
                     print(f"FCM 메시지 전송 실패: {e}")
-
+            else:
+                print(f"유효하지 않은 FCM 토큰: {token} - 카테고리: {category.category}")
