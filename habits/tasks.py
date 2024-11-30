@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 @shared_task(bind=True, acks_late=True)
 def send_category_alarm(self, category_id=None):
     try:
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
 
         # 카테고리 필터링
         categories = Category.objects.filter(
