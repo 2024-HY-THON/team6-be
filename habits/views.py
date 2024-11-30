@@ -38,7 +38,30 @@ class CategoryDelete(APIView):
             {"message": "Category deleted successfully"},
             status=status.HTTP_204_NO_CONTENT
         )
-    
+
+class CategoryCreate(APIView):
+    def post(self, request, user_id):
+        user = get_object_or_404(CustomUser, id=user_id)
+
+        category_name = request.data.get("category")
+        if not category_name:
+            return Response(
+                {"error": "Category name is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        category = Category.objects.create(user=user, category=category_name)
+
+        serializer = CategorySerializer(category)
+        return Response(
+            {
+                "message": "Category created successfully.",
+                "category": serializer.data
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+
 class HabitCreate(APIView):
     def post(self, request, user_id):
         # 사용자 가져오기
