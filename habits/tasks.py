@@ -16,8 +16,8 @@ def send_category_alarm(self, category_id=None):
         categories = Category.objects.filter(
             category_id=category_id,
             choose=True,
-            # alarm_time__hour=now.hour,
-            # alarm_time__minute=now.minute
+            alarm_time__hour=now.hour,
+            alarm_time__minute=now.minute
         ).select_related('user')
 
         if not categories.exists():

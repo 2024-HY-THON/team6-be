@@ -1,18 +1,19 @@
-# config/celery.py
 from celery import Celery
-from datetime import timedelta
+from celery.schedules import schedule
 import os
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
 app = Celery('config')
 
+# Django 설정을 Celery에 로드
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
+# Celery Beat 스케줄 설정
 app.conf.beat_schedule = {
-    'send_category_alarm_every_minute': {
-        'task': 'send_category_alarm',
-        'schedule': timedelta(minutes=1),  # 1분마다 작업을 실행
+    'send_category_alarm_every_30_seconds': {
+        'task': 'habits.tasks.send_category_alarm',  # 정확한 경로로 수정
+        'schedule': schedule(30.0),  # 30초마다 실행
     },
 }
 
