@@ -164,6 +164,28 @@ class ActionCreate(APIView):
             status=status.HTTP_201_CREATED
         )
 
+class UserAction(APIView):
+    def get(self, request, user_id):
+        user = get_object_or_404(CustomUser, id=user_id)
+
+        today = now().date()
+
+        today_actions = Action.objects.filter(
+            habit__user=user,
+            created=today
+        )
+
+        completed_count = today_actions.filter(do_or_not=True).count()
+        not_completed_count = today_actions.filter(do_or_not=False).count()
+
+        response_data = {
+            "completed_count": completed_count,
+            "not_completed_count": not_completed_count
+        }
+
+        return Response(response_data, status=200)
+
+
 
 class MainPage(APIView):
     def get(self, request, user_id):
