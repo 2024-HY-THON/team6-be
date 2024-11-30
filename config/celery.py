@@ -18,4 +18,4 @@ app.conf.beat_schedule = {
 
 app.autodiscover_tasks()
 
-broker_url = 'amqp://solu0302:eatrlee320@3.223.239.126//'
+broker_url = 'amqp://mine:mine@3.223.239.126//'
