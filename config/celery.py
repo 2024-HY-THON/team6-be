@@ -6,7 +6,10 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
 app = Celery('config')
 
-app.conf.timezone = 'Asia/Seoul'
+app.conf.update(
+    timezone='Asia/Seoul',  # 한국 시간대로 설정
+    enable_utc=True,  # UTC 시간 사용 활성화
+)
 
 # Django 설정을 Celery에 로드
 app.config_from_object('django.conf:settings', namespace='CELERY')

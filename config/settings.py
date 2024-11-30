@@ -144,6 +144,8 @@ LANGUAGE_CODE = 'ko-kr'
 
 TIME_ZONE = 'Asia/Seoul'
 
+CELERY_TIMEZONE = 'Asia/Seoul'
+
 USE_TZ = True
 
 USE_I18N = True
