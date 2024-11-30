@@ -13,7 +13,7 @@ urlpatterns = [
 
     path('alarm/update/<str:user_id>/<int:category_id>/', CategoryAlarmTimeUpdate.as_view(), name='category-alarm-time-update'),
 
-    path('random/habit/<str:user_id>/<int:category_id>/', CategoryRandomHabitView.as_view(), name='category-random-habit'),
+    path('random/habit/<str:user_id>/', CategoryRandomHabitView.as_view(), name='category-random-habit'),
 
     path('trigger-alarm/<int:category_id>/', TriggerAlarmTask.as_view(), name='trigger_alarm_task'),
 ]

@@ -7,6 +7,8 @@ from django.shortcuts import get_object_or_404
 from users.models import CustomUser  # CustomUser 모델 import
 from django.utils.timezone import now
 from rest_framework.permissions import IsAuthenticated
+import random
+from django.db.models import Prefetch
 
 from .tasks import send_category_alarm
 
@@ -201,18 +203,41 @@ class CategoryAlarmTimeUpdate(APIView):
 class CategoryRandomHabitView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, user_id, category_id):
+    def get(self, request, user_id):
         try:
-            category = Category.objects.get(category_id=category_id, user__id=user_id)
-            random_habit = category.random_habit
-            if random_habit:
-                return Response({
-                    'category': category.category,
-                    'random_habit': random_habit.content
-                })
-            return Response({'error': 'No habit selected yet.'}, status=404)
-        except Category.DoesNotExist:
-            return Response({'error': 'Category not found.'}, status=404)
+            # user_id에 해당하는 사용자 확인
+            user = get_object_or_404(CustomUser, id=user_id)
+
+            # choose=True인 카테고리를 미리 Habit과 함께 가져오기
+            categories = Category.objects.filter(
+                user=user, choose=True
+            ).prefetch_related(
+                Prefetch('habit_set', queryset=Habit.objects.filter(user=user))
+            )
+
+            if not categories:
+                return Response({'error': 'No categories with choose=True found.'}, status=404)
+
+            # 카테고리에서 랜덤하게 선택
+            category = random.choice(categories)
+
+            # 해당 카테고리의 Habit 목록 가져오기
+            habits = category.habit_set.all()
+
+            if not habits:
+                return Response({'error': f'No habits found for category {category.category}.'}, status=404)
+
+            # Habit에서 랜덤하게 선택
+            random_habit = random.choice(habits)
+
+            # 결과 반환
+            return Response({
+                'category': category.category,
+                'random_habit': random_habit.content
+            }, status=200)
+
+        except CustomUser.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=404)
 
 
 class TriggerAlarmTask(APIView):
