@@ -38,7 +38,30 @@ class CategoryDelete(APIView):
             {"message": "Category deleted successfully"},
             status=status.HTTP_204_NO_CONTENT
         )
-    
+
+class CategoryCreate(APIView):
+    def post(self, request, user_id):
+        user = get_object_or_404(CustomUser, id=user_id)
+
+        category_name = request.data.get("category")
+        if not category_name:
+            return Response(
+                {"error": "Category name is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        category = Category.objects.create(user=user, category=category_name)
+
+        serializer = CategorySerializer(category)
+        return Response(
+            {
+                "message": "Category created successfully.",
+                "category": serializer.data
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+
 class HabitCreate(APIView):
     def post(self, request, user_id):
         # 사용자 가져오기
@@ -106,38 +129,41 @@ class UpdateContent(APIView):
     
 class ActionCreate(APIView):
     def post(self, request):
-        # 요청 Body에서 습관 ID와 실천 여부를 가져옴
         habit_id = request.data.get("habit_id")
         do_or_not = request.data.get("do_or_not")
 
-        # 필수 필드 검증
         if habit_id is None or do_or_not is None:
             return Response(
                 {"error": "Both 'habit_id' and 'do_or_not' fields are required."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # 습관(Habit) 객체 가져오기
         habit = get_object_or_404(Habit, habit_id=habit_id)
 
-        # Action 데이터 생성
-        action = Action.objects.create(
+        Action.objects.create(
             habit=habit,
             do_or_not=do_or_not
         )
 
-        # 성공적으로 생성된 데이터 반환
+        today = now().date()
+
+        today_actions = Action.objects.filter(
+            habit__user=habit.user,
+            created=today
+        )
+
+        completed_count = today_actions.filter(do_or_not=True).count()
+        not_completed_count = today_actions.filter(do_or_not=False).count()
+
         return Response(
             {
                 "message": "Action created successfully.",
-                "action": {
-                    "habit_id": action.habit.habit_id,
-                    "do_or_not": action.do_or_not,
-                    "created": action.created
-                }
+                "completed_count": completed_count,
+                "not_completed_count": not_completed_count
             },
             status=status.HTTP_201_CREATED
         )
+
 
 class MainPage(APIView):
     def get(self, request, user_id):
@@ -228,10 +254,8 @@ class CategoryRandomHabitView(APIView):
 
     def get(self, request, user_id):
         try:
-            # user_id에 해당하는 사용자 확인
             user = get_object_or_404(CustomUser, id=user_id)
 
-            # choose=True인 카테고리를 미리 Habit과 함께 가져오기
             categories = Category.objects.filter(
                 user=user, choose=True
             ).prefetch_related(
@@ -241,19 +265,15 @@ class CategoryRandomHabitView(APIView):
             if not categories:
                 return Response({'error': 'No categories with choose=True found.'}, status=404)
 
-            # 카테고리에서 랜덤하게 선택
             category = random.choice(categories)
 
-            # 해당 카테고리의 Habit 목록 가져오기
             habits = category.habit_set.all()
 
             if not habits:
                 return Response({'error': f'No habits found for category {category.category}.'}, status=404)
 
-            # Habit에서 랜덤하게 선택
             random_habit = random.choice(habits)
 
-            # 결과 반환
             return Response({
                 'category': category.category,
                 'random_habit': {
