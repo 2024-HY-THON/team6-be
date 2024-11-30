@@ -29,8 +29,8 @@ def send_category_alarm(self, category_id=None):
             category.random_habit = habit
             category.save(update_fields=['random_habit'])
 
-            token = user.fcm_token  # 유저의 FCM 토큰 가져오기
-            # token = 
+            # token = user.fcm_token  # 유저의 FCM 토큰 가져오기
+            token = "dh7WSNisRFWeHLLue9bc-S:APA91bGvhNtXeY3sIeyLGCLGAr3FOyqIpGKr3333_aRr5mf7__4nOLGBSs9CWAFP8aSn5R91n2sdvjitTOawqPtmK8dvQ7OCNb8qMcMiYTH8knDX36qf_BY"
 
             message_title = f"알림: {category.category}"
             message_body = f"오늘의 습관: {habit.content}"
