@@ -4,13 +4,14 @@ from .models import Category, Habit
 from config.fcm import send_alarm_message
 from random import choice
 import logging
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
 @shared_task(bind=True, acks_late=True)
 def send_category_alarm(self, category_id=None):
     try:
-        now = datetime.now()
+        now = timezone.localtime(timezone.now())
 
         # 카테고리 필터링
         categories = Category.objects.filter(
